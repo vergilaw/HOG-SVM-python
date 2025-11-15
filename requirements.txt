@@ -1,0 +1,17 @@
+# Core dependencies for Face Detection using HOG + SVM
+
+# Computer vision
+opencv-python==4.5.5.64
+
+# Machine learning
+scikit-learn==0.22.2.post1
+scikit-image==0.17.2
+
+# Numerical computation
+numpy==1.19.5
+
+# Image processing
+Pillow==8.4.0
+
+# Optional: For better performance
+# joblib==1.1.0  # Already included in scikit-learn

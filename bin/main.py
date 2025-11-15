@@ -3,7 +3,7 @@
 Complete Face Detection Pipeline
 This script will guide you through the complete face detection workflow:
 1. Download and prepare face dataset
-2. Extract HOG features from face images
+2. Extract HOG features from images
 3. Train SVM classifier
 4. Test on sample images
 """
@@ -39,17 +39,17 @@ def main():
 
     # Step 1: Prepare dataset
     if not dataset_exists:
-        print_step(1, "Preparing Face Dataset")
+        print_step(1, "Preparing Dataset")
         print "Dataset not found. Running dataset preparation script..."
         print "This will download the LFW (Labeled Faces in the Wild) dataset."
         print "This may take several minutes depending on your internet connection."
 
         response = raw_input("\nDo you want to proceed? (y/n): ")
         if response.lower() == 'y':
-            os.system("python prepare-face-dataset.py")
+            os.system("python prepare-dataset.py")
         else:
             print "Skipping dataset preparation."
-            print "You can run it manually later with: python prepare-face-dataset.py"
+            print "You can run it manually later with: python prepare-dataset.py"
     else:
         print_step(1, "Dataset Check")
         print "Dataset already exists at ../data/dataset/faces/"
@@ -57,13 +57,13 @@ def main():
     # Step 2: Extract features
     if not features_exist:
         print_step(2, "Extracting HOG Features")
-        print "Extracting features from face images..."
+        print "Extracting features from images..."
 
         pos_path = "../data/dataset/faces/pos"
         neg_path = "../data/dataset/faces/neg"
 
         if os.path.exists(pos_path) and os.path.exists(neg_path):
-            cmd = "python ../object-detector/extract-features-face.py -p {} -n {}".format(
+            cmd = "python ../object-detector/extract-features.py -p {} -n {}".format(
                 pos_path, neg_path)
             os.system(cmd)
         else:
@@ -76,13 +76,13 @@ def main():
     # Step 3: Train classifier
     if not model_exists:
         print_step(3, "Training SVM Classifier")
-        print "Training the Linear SVM classifier for face detection..."
+        print "Training the Linear SVM classifier..."
 
         pos_feat_path = "../data/features/face/pos"
         neg_feat_path = "../data/features/face/neg"
 
         if os.path.exists(pos_feat_path) and os.path.exists(neg_feat_path):
-            cmd = "python ../object-detector/train-classifier-face.py -p {} -n {}".format(
+            cmd = "python ../object-detector/train-classifier.py -p {} -n {}".format(
                 pos_feat_path, neg_feat_path)
             os.system(cmd)
         else:
@@ -93,7 +93,7 @@ def main():
         print "Trained model already exists at ../data/models/face_svm.model"
 
     # Step 4: Test on sample image
-    print_step(4, "Testing Face Detector")
+    print_step(4, "Testing Detector")
 
     # Check if we have a test image
     test_image = None
@@ -119,30 +119,30 @@ def main():
 
     if test_image:
         print "Found test image: {}".format(test_image)
-        print "\nRunning face detection..."
+        print "\nRunning detection..."
         print "(Close the image windows to continue)"
 
-        cmd = "python ../object-detector/test-classifier-face.py -i {} -d 1.25".format(
+        cmd = "python ../object-detector/test-classifier.py -i {} -d 1.25".format(
             test_image)
         os.system(cmd)
     else:
         print "No test image found."
         print "You can test the detector manually with:"
-        print "  python ../object-detector/test-classifier-face.py -i <image_path>"
+        print "  python ../object-detector/test-classifier.py -i <image_path>"
 
     # Final summary
-    print_banner("Face Detection Setup Complete!")
+    print_banner("Setup Complete!")
 
     print "Your face detection system is ready to use!"
     print "\nTo detect faces in your own images, run:"
-    print "  python ../object-detector/test-classifier-face.py -i <image_path>"
+    print "  python ../object-detector/test-classifier.py -i <image_path>"
     print "\nOptional parameters:"
     print "  -d <downscale>   : Downscale factor for image pyramid (default: 1.25)"
     print "  -v              : Visualize sliding window process"
     print "\nExample:"
-    print "  python ../object-detector/test-classifier-face.py -i my_photo.jpg -d 1.3"
+    print "  python ../object-detector/test-classifier.py -i my_photo.jpg -d 1.3"
 
-    print "\nConfiguration file: ../data/config/config-face.cfg"
+    print "\nConfiguration file: ../data/config/config.cfg"
     print "Model file: ../data/models/face_svm.model"
 
     print "\n" + "=" * 70

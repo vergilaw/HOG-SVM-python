@@ -1,127 +1,171 @@
-# object-detector
-Object Detector using HOG as descriptor and Linear SVM as classifier. | [Video](https://www.youtube.com/watch?v=SPXocFBjr70)
+# Face Detector - HOG + SVM
 
-**NEW:** Now supports both **Car Detection** (original) and **Face Detection**!
+Phát hiện khuôn mặt trong ảnh sử dụng HOG (Histogram of Oriented Gradients) features và Linear SVM classifier.
 
-## Quick Start
+## Tính năng
 
-### Option 1: Car Detection (Original)
+- Phát hiện khuôn mặt trong ảnh với độ chính xác cao
+- Sử dụng kỹ thuật sliding window và image pyramid để phát hiện đa tỷ lệ
+- Pipeline tự động từ chuẩn bị dataset đến training và testing
+- Dễ dàng cấu hình và tùy chỉnh tham số
 
-Run the car detector with the original functionality.
+## Cài đặt
 
-### Option 2: Face Detection (New!)
+### Yêu cầu hệ thống
 
-Detect faces in images using the same HOG+SVM approach.
+- Python 2.7
+- OpenCV
+- scikit-learn
+- scikit-image
+- numpy
 
-```shell
+### Cài đặt dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Sử dụng nhanh
+
+### Cách 1: Chạy pipeline tự động (Khuyến nghị)
+
+```bash
 cd bin
-python test-face-detector.py
+python main.py
 ```
 
-This will:
-1. Download the LFW (Labeled Faces in the Wild) dataset
-2. Extract HOG features from face images
-3. Train a Linear SVM classifier
-4. Test the face detector on sample images
+Script này sẽ tự động:
+1. Download dataset LFW (Labeled Faces in the Wild)
+2. Chuẩn bị positive và negative samples
+3. Trích xuất HOG features
+4. Huấn luyện SVM classifier
+5. Test trên ảnh mẫu
 
-## Run the code
-
-I have created a single python script that can be used to test the code. To test the code, run the lines below in your terminal.
-
-```shell
-git clone https://github.com/bikz05/object-detector.git
-cd object-detector/bin
-test-object-detector
-```
-
-_The `test-object-detector` will download the [UIUC Image Database for Car Detection](https://cogcomp.cs.illinois.edu/Data/Car/) and train a classifier to detect cars in an image. The SVM model files will be stored in `data/models`, so that they can be resused later on._
-
-### Configuration File
-
-All the configurations are in the `data/config/config.cfg` configuration files. You can change it as per your need. Here is what the default configuration file looks like (which I have set for Car Detector)-
+### Cách 2: Chạy từng bước thủ công
 
 ```bash
-[hog]
-min_wdw_sz: [100, 40]
-step_size: [10, 10]
-orientations: 9
-pixels_per_cell: [8, 8]
-cells_per_block: [3, 3]
-visualize: False
-normalize: True
+# Bước 1: Chuẩn bị dataset
+cd bin
+python prepare-dataset.py
 
-[nms]
-threshold: .3
+# Bước 2: Trích xuất features
+python ../object-detector/extract-features.py \
+    -p ../data/dataset/faces/pos \
+    -n ../data/dataset/faces/neg
 
-[paths]
-pos_feat_ph: ../data/features/pos
-neg_feat_ph: ../data/features/neg
-model_path: ../data/models/svm.model
+# Bước 3: Huấn luyện classifier
+python ../object-detector/train-classifier.py \
+    -p ../data/features/face/pos \
+    -n ../data/features/face/neg
+
+# Bước 4: Test trên ảnh của bạn
+python ../object-detector/test-classifier.py -i /path/to/your/image.jpg
 ```
 
-### About the modules
+## Sử dụng trên PyCharm
 
-* `extract-features.py` -- This module is used to extract HOG features of the training images.
-* `train-classifier.py` -- This module is used to train the classifier.
-* `nms.py` -- This module performs Non Maxima Suppression.
-* `test-classifier.py` -- This module is used to test the classifier using a test image.
-* `config.py` -- Imports the configuration variables from `config.cfg`.
+### 1. Mở project trong PyCharm
 
-## Some of the results
+1. Mở PyCharm
+2. Chọn **File** > **Open**
+3. Chọn thư mục `HOG-SVM-python`
+4. Click **OK**
 
-#### Test Image 1
-_Detections before NMS_
+### 2. Cấu hình Python Interpreter
 
-![Image 1](data/images/test-im-1.png)
+1. Chọn **File** > **Settings** (hoặc **PyCharm** > **Preferences** trên macOS)
+2. Vào **Project: HOG-SVM-python** > **Python Interpreter**
+3. Click biểu tượng **⚙️** > **Add**
+4. Chọn **Virtualenv Environment** > **New environment**
+5. Click **OK**
+6. Chờ PyCharm tạo virtual environment
 
-_Detections after NMS_
+### 3. Cài đặt Dependencies trong PyCharm
 
-![](data/images/test-im-1-nms.png)
-#### Test Image 2
-_Detections before NMS_
+**Cách 1: Từ requirements.txt**
+1. Mở file `requirements.txt`
+2. PyCharm sẽ hiện thông báo "Package requirements are not satisfied"
+3. Click **Install requirements**
 
-![](data/images/test-im-2.png)
-
-_Detections after NMS_
-
-![](data/images/test-im-2-nms.png)
-#### Test Image 3
-_Detections before NMS_
-
-![](data/images/test-im-3.png)
-
-_Detections after NMS_
-
-![](data/images/test-im-3-nms.png)
-#### Test Image 4
-_Detections before NMS_
-
-![](data/images/test-im-4.png)
-
-_Detections after NMS_
-
-![](data/images/test-im-4-nms.png)
-
-## Face Detection Module
-
-This project now includes a complete face detection pipeline using the same HOG+SVM architecture.
-
-### Face Detection Configuration
-
-The face detection configuration is in `data/config/config-face.cfg`:
-
+**Cách 2: Thủ công**
+1. Mở Terminal trong PyCharm (**View** > **Tool Windows** > **Terminal**)
+2. Chạy:
 ```bash
+pip install -r requirements.txt
+```
+
+### 4. Chạy Main Script trong PyCharm
+
+1. Mở file `bin/main.py`
+2. Click chuột phải vào file
+3. Chọn **Run 'main'**
+
+Hoặc:
+1. Mở `main.py`
+2. Nhấn **Shift + F10** (Windows/Linux) hoặc **Control + R** (macOS)
+
+### 5. Chạy Test Classifier trong PyCharm
+
+1. Mở file `object-detector/test-classifier.py`
+2. Tạo Run Configuration:
+   - Click **Run** > **Edit Configurations**
+   - Click **+** > **Python**
+   - Name: `Test Face Detector`
+   - Script path: Chọn `object-detector/test-classifier.py`
+   - Parameters: `-i /path/to/image.jpg -d 1.25`
+   - Working directory: `object-detector`
+   - Click **OK**
+3. Click **Run** > **Run 'Test Face Detector'**
+
+### 6. Debug trong PyCharm
+
+1. Đặt breakpoint bằng cách click vào lề trái của dòng code
+2. Click chuột phải vào file
+3. Chọn **Debug 'filename'**
+4. Sử dụng Debug panel để:
+   - Step Over (F8)
+   - Step Into (F7)
+   - Resume Program (F9)
+   - Xem biến trong Variables panel
+
+### 7. Tổ chức Project trong PyCharm
+
+Cấu trúc project:
+```
+HOG-SVM-python/
+├── bin/                      # Scripts chính
+│   ├── main.py              # Pipeline tự động
+│   └── prepare-dataset.py   # Chuẩn bị dataset
+├── object-detector/         # Module phát hiện
+│   ├── extract-features.py  # Trích xuất HOG features
+│   ├── train-classifier.py  # Huấn luyện SVM
+│   ├── test-classifier.py   # Test detector
+│   └── nms.py              # Non-maximum suppression
+├── data/
+│   ├── config/
+│   │   └── config.cfg      # Cấu hình HOG & SVM
+│   ├── dataset/            # Dataset ảnh
+│   ├── features/           # HOG features
+│   └── models/             # Trained models
+└── requirements.txt        # Python dependencies
+```
+
+## Cấu hình
+
+File cấu hình: `data/config/config.cfg`
+
+```ini
 [hog]
-min_wdw_sz: [64, 64]
-step_size: [8, 8]
-orientations: 9
-pixels_per_cell: [8, 8]
-cells_per_block: [2, 2]
-visualize: False
-transform_sqrt: True
+min_wdw_sz: [64, 64]        # Kích thước cửa sổ
+step_size: [8, 8]           # Bước trượt
+orientations: 9             # Số hướng gradient
+pixels_per_cell: [8, 8]     # Pixel mỗi cell
+cells_per_block: [2, 2]     # Cell mỗi block
+visualize: False            # Visualize HOG
+transform_sqrt: True        # Chuẩn hóa sqrt
 
 [nms]
-threshold: 0.3
+threshold: 0.3              # Ngưỡng NMS
 
 [paths]
 pos_feat_ph: ../data/features/face/pos
@@ -129,63 +173,109 @@ neg_feat_ph: ../data/features/face/neg
 model_path: ../data/models/face_svm.model
 ```
 
-### Face Detection Modules
+## Tùy chỉnh và Mở rộng
 
-* `prepare-face-dataset.py` -- Downloads and prepares the LFW face dataset
-* `extract-features-face.py` -- Extracts HOG features from face images
-* `train-classifier-face.py` -- Trains the SVM classifier for faces
-* `test-classifier-face.py` -- Tests the face detector on images
-* `test-face-detector.py` -- Complete pipeline script (recommended)
+### Thay đổi dataset
 
-### Manual Face Detection Workflow
+Để sử dụng dataset khác:
+1. Chuẩn bị ảnh positive (có khuôn mặt) 64x64 pixels
+2. Chuẩn bị ảnh negative (không có khuôn mặt) 64x64 pixels
+3. Đặt vào `data/dataset/faces/pos/` và `data/dataset/faces/neg/`
+4. Chạy feature extraction và training
 
-If you want to run each step manually:
+### Tùy chỉnh tham số HOG
 
-```shell
-# Step 1: Prepare dataset
-cd bin
-python prepare-face-dataset.py
+Chỉnh sửa `data/config/config.cfg`:
+- Tăng `orientations` để capture chi tiết hơn
+- Giảm `step_size` để tăng độ chính xác (nhưng chậm hơn)
+- Thay đổi `min_wdw_sz` nếu khuôn mặt có kích thước khác
 
-# Step 2: Extract features
-python ../object-detector/extract-features-face.py
+### Tối ưu hiệu năng
 
-# Step 3: Train classifier
-python ../object-detector/train-classifier-face.py
+- Tăng `step_size` để tăng tốc độ
+- Tăng `downscale` factor khi test
+- Giảm số lượng orientations
+- Sử dụng Hard Negative Mining
 
-# Step 4: Test on an image
-python ../object-detector/test-classifier-face.py -i /path/to/image.jpg
-```
+## Các Module
 
-### Face Detection Usage
+### bin/prepare-dataset.py
+Download và chuẩn bị dataset LFW cho face detection.
 
-After training, you can detect faces in any image:
-
-```shell
-python ../object-detector/test-classifier-face.py -i your_image.jpg -d 1.25
-```
+### object-detector/extract-features.py
+Trích xuất HOG features từ ảnh training.
 
 Parameters:
-- `-i` : Path to input image (required)
-- `-d` : Downscale factor for image pyramid (default: 1.25)
-- `-v` : Visualize the sliding window process
+- `-p, --pospath`: Đường dẫn đến ảnh positive
+- `-n, --negpath`: Đường dẫn đến ảnh negative
+- `-d, --descriptor`: Loại descriptor (mặc định: HOG)
 
-## TODO
+### object-detector/train-classifier.py
+Huấn luyện Linear SVM classifier.
 
-Here is list of tasks that I am planning to implement in the future -
+Parameters:
+- `-p, --posfeat`: Đường dẫn đến positive features
+- `-n, --negfeat`: Đường dẫn đến negative features
+- `-c, --classifier`: Loại classifier (mặc định: LIN_SVM)
 
-* Optimize code to use more `numpy` vectorized codes.
-* Faster NMS code.
-* Add bootstrapping (Hard Negative Mining) code.
-* Improve face detection with better negative samples
-* Add support for more object types
+### object-detector/test-classifier.py
+Test face detector trên ảnh.
 
+Parameters:
+- `-i, --image`: Đường dẫn đến ảnh test (required)
+- `-d, --downscale`: Tỷ lệ downscale cho image pyramid (default: 1.25)
+- `-v, --visualize`: Hiển thị quá trình sliding window
 
-## Useful tutorials
+Example:
+```bash
+python test-classifier.py -i photo.jpg -d 1.3 -v
+```
+
+### object-detector/nms.py
+Non-Maximum Suppression để loại bỏ các detection trùng lặp.
+
+## Kết quả mẫu
+
+Sau khi chạy detection, bạn sẽ thấy:
+1. **Raw Detections before NMS**: Tất cả các detection trước khi lọc
+2. **Final Detections after NMS**: Detection cuối cùng sau khi loại bỏ trùng lặp
+
+## Khắc phục sự cố
+
+### Lỗi import cv2
+```bash
+pip install opencv-python
+```
+
+### Lỗi sklearn.externals
+Nếu dùng scikit-learn >= 0.23:
+```bash
+pip install scikit-learn==0.22.2
+```
+
+### Lỗi không tìm thấy model
+Đảm bảo đã chạy training:
+```bash
+python train-classifier.py -p ../data/features/face/pos -n ../data/features/face/neg
+```
+
+### Phát hiện không chính xác
+- Thêm nhiều ảnh training hơn
+- Cải thiện chất lượng negative samples
+- Điều chỉnh tham số trong config.cfg
+- Sử dụng Hard Negative Mining
+
+## Tài liệu tham khảo
 
 1. [Histogram of Oriented Gradients and Object Detection](http://www.pyimagesearch.com/2014/11/10/histogram-oriented-gradients-object-detection/)
 2. [Image Pyramids with Python and OpenCV](http://www.pyimagesearch.com/2015/03/16/image-pyramids-with-python-and-opencv/)
-3. [Sliding Windows for Object Detection with Python and OpenCV](http://www.pyimagesearch.com/2015/03/23/sliding-windows-for-object-detection-with-python-and-opencv/)
-4. [Non-Maximum Suppression for Object Detection in Python](http://www.pyimagesearch.com/2014/11/17/non-maximum-suppression-object-detection-python/)
-5. [(Faster) Non-Maximum Suppression in Python](http://www.pyimagesearch.com/2015/02/16/faster-non-maximum-suppression-python/)
-6. [Texture Matching using Local Binary Patterns (LBP), OpenCV, scikit-learn and Python](http://hanzratech.in/2015/05/30/local-binary-patterns.html)
-7. [Detección de objetos Course by Coursera](https://www.coursera.org/course/deteccionobjetos)
+3. [Sliding Windows for Object Detection](http://www.pyimagesearch.com/2015/03/23/sliding-windows-for-object-detection-with-python-and-opencv/)
+4. [Non-Maximum Suppression for Object Detection](http://www.pyimagesearch.com/2014/11/17/non-maximum-suppression-object-detection-python/)
+
+## License
+
+MIT License - xem file LICENSE để biết thêm chi tiết.
+
+## Credits
+
+Based on the original HOG-SVM object detector, adapted specifically for face detection.
