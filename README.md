@@ -1,6 +1,29 @@
 # object-detector
 Object Detector using HOG as descriptor and Linear SVM as classifier. | [Video](https://www.youtube.com/watch?v=SPXocFBjr70)
 
+**NEW:** Now supports both **Car Detection** (original) and **Face Detection**!
+
+## Quick Start
+
+### Option 1: Car Detection (Original)
+
+Run the car detector with the original functionality.
+
+### Option 2: Face Detection (New!)
+
+Detect faces in images using the same HOG+SVM approach.
+
+```shell
+cd bin
+python test-face-detector.py
+```
+
+This will:
+1. Download the LFW (Labeled Faces in the Wild) dataset
+2. Extract HOG features from face images
+3. Train a Linear SVM classifier
+4. Test the face detector on sample images
+
 ## Run the code
 
 I have created a single python script that can be used to test the code. To test the code, run the lines below in your terminal.
@@ -79,6 +102,73 @@ _Detections after NMS_
 
 ![](data/images/test-im-4-nms.png)
 
+## Face Detection Module
+
+This project now includes a complete face detection pipeline using the same HOG+SVM architecture.
+
+### Face Detection Configuration
+
+The face detection configuration is in `data/config/config-face.cfg`:
+
+```bash
+[hog]
+min_wdw_sz: [64, 64]
+step_size: [8, 8]
+orientations: 9
+pixels_per_cell: [8, 8]
+cells_per_block: [2, 2]
+visualize: False
+transform_sqrt: True
+
+[nms]
+threshold: 0.3
+
+[paths]
+pos_feat_ph: ../data/features/face/pos
+neg_feat_ph: ../data/features/face/neg
+model_path: ../data/models/face_svm.model
+```
+
+### Face Detection Modules
+
+* `prepare-face-dataset.py` -- Downloads and prepares the LFW face dataset
+* `extract-features-face.py` -- Extracts HOG features from face images
+* `train-classifier-face.py` -- Trains the SVM classifier for faces
+* `test-classifier-face.py` -- Tests the face detector on images
+* `test-face-detector.py` -- Complete pipeline script (recommended)
+
+### Manual Face Detection Workflow
+
+If you want to run each step manually:
+
+```shell
+# Step 1: Prepare dataset
+cd bin
+python prepare-face-dataset.py
+
+# Step 2: Extract features
+python ../object-detector/extract-features-face.py
+
+# Step 3: Train classifier
+python ../object-detector/train-classifier-face.py
+
+# Step 4: Test on an image
+python ../object-detector/test-classifier-face.py -i /path/to/image.jpg
+```
+
+### Face Detection Usage
+
+After training, you can detect faces in any image:
+
+```shell
+python ../object-detector/test-classifier-face.py -i your_image.jpg -d 1.25
+```
+
+Parameters:
+- `-i` : Path to input image (required)
+- `-d` : Downscale factor for image pyramid (default: 1.25)
+- `-v` : Visualize the sliding window process
+
 ## TODO
 
 Here is list of tasks that I am planning to implement in the future -
@@ -86,6 +176,8 @@ Here is list of tasks that I am planning to implement in the future -
 * Optimize code to use more `numpy` vectorized codes.
 * Faster NMS code.
 * Add bootstrapping (Hard Negative Mining) code.
+* Improve face detection with better negative samples
+* Add support for more object types
 
 
 ## Useful tutorials
